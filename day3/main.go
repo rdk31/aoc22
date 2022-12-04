@@ -27,7 +27,7 @@ func main() {
 		lines = append(lines, line)
 	}
 
-	day1 := 0
+	part1 := 0
 
 	for _, line := range lines {
 		middle := len(line) / 2
@@ -44,16 +44,16 @@ func main() {
 
 		for k, _ := range m_contains {
 			if int(k) > int('Z') {
-				day1 += int(k) - int('a') + 1
+				part1 += int(k) - int('a') + 1
 			} else {
-				day1 += int(k) - int('A') + 27
+				part1 += int(k) - int('A') + 27
 			}
 		}
 	}
 
-	fmt.Println(day1)
+	fmt.Println(part1)
 
-	day2 := 0
+	part2 := 0
 
 	_, err = file.Seek(0, io.SeekStart)
 	if err != nil {
@@ -81,13 +81,13 @@ func main() {
 		for k, v := range m_contains {
 			if v {
 				if int(k) > int('Z') {
-					day2 += int(k) - int('a') + 1
+					part2 += int(k) - int('a') + 1
 				} else {
-					day2 += int(k) - int('A') + 27
+					part2 += int(k) - int('A') + 27
 				}
 			}
 		}
 	}
 
-	fmt.Println(day2)
+	fmt.Println(part2)
 }
