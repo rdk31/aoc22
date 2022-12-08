@@ -1,3 +1,5 @@
+use take_until::TakeUntilExt;
+
 type Map = Vec<Vec<u32>>;
 
 fn parse_input(input: &str) -> Map {
@@ -12,55 +14,21 @@ fn part1(map: &Map) -> usize {
 
     for y in 1..map.len() - 1 {
         for x in 1..map[y].len() - 1 {
-            let mut visible = true;
+            let height = map[y][x];
 
-            for up in 0..y {
-                if map[up][x] >= map[y][x] {
-                    visible = false;
-                    break;
-                }
-            }
+            let up = (0..y).map(|up| map[up][x]).all(|h| h < height);
 
-            if visible {
-                count += 1;
-                continue;
-            }
+            let down = (y + 1..map.len())
+                .map(|down| map[down][x])
+                .all(|h| h < height);
 
-            visible = true;
-            for down in y + 1..map.len() {
-                if map[down][x] >= map[y][x] {
-                    visible = false;
-                    break;
-                }
-            }
+            let left = (0..x).map(|left| map[y][left]).all(|h| h < height);
 
-            if visible {
-                count += 1;
-                continue;
-            }
+            let right = (x + 1..map[y].len())
+                .map(|right| map[y][right])
+                .all(|h| h < height);
 
-            visible = true;
-            for left in 0..x {
-                if map[y][left] >= map[y][x] {
-                    visible = false;
-                    break;
-                }
-            }
-
-            if visible {
-                count += 1;
-                continue;
-            }
-
-            visible = true;
-            for right in x + 1..map[y].len() {
-                if map[y][right] >= map[y][x] {
-                    visible = false;
-                    break;
-                }
-            }
-
-            if visible {
+            if up || down || left || right {
                 count += 1;
             }
         }
@@ -76,43 +44,27 @@ fn part2(map: &Map) -> usize {
         for x in 1..map[y].len() - 1 {
             let height = map[y][x];
 
-            let mut up = 0;
-            for h in map.iter().take(y).rev().map(|row| row[x]) {
-                up += 1;
-                if h >= height {
-                    break;
-                }
-            }
-
-            let mut down = 0;
-            for h in map
-                .iter()
+            let up = (0..y)
                 .rev()
-                .take(map.len() - y - 1)
+                .map(|up| map[up][x])
+                .take_until(|&h| h >= height)
+                .count();
+
+            let down = (y + 1..map.len())
+                .map(|down| map[down][x])
+                .take_until(|&h| h >= height)
+                .count();
+
+            let left = (0..x)
                 .rev()
-                .map(|row| row[x])
-            {
-                down += 1;
-                if h >= height {
-                    break;
-                }
-            }
+                .map(|left| map[y][left])
+                .take_until(|&h| h >= height)
+                .count();
 
-            let mut left = 0;
-            for h in map[y].iter().take(x).rev() {
-                left += 1;
-                if *h >= height {
-                    break;
-                }
-            }
-
-            let mut right = 0;
-            for h in map[y].iter().rev().take(map[y].len() - x - 1).rev() {
-                right += 1;
-                if *h >= height {
-                    break;
-                }
-            }
+            let right = (x + 1..map[y].len())
+                .map(|right| map[y][right])
+                .take_until(|&h| h >= height)
+                .count();
 
             let score = up * down * left * right;
             if max_score < score {
